@@ -741,23 +741,37 @@ function [Phi, Q] = get_transition_matrices_v5(model_name, model_params, noise_i
 end
 
 function [Phi, Q] = singer_discretization_vanloan(A, B, Qc, T)
-    % Singer模型的Van Loan精确离散化
+    % **修正：Van Loan离散化的正确实现**
+    % 
+    % 输入：
+    %   A: 连续状态矩阵 (n×n)
+    %   B: 输入矩阵 (n×1)
+    %   Qc: 连续过程噪声强度（标量）
+    %   T: 采样周期
+    % 
+    % 输出：
+    %   Phi: 离散状态转移矩阵
+    %   Q: 离散过程噪声协方差
     
     n = size(A, 1);
-    G = B * Qc * B';
+    G = B * Qc * B.';  % 连续域过程噪声协方差密度 (n×n)
     
-    M = [-A,            G; 
-         zeros(n, n),   A'];
+    % **修正：正确的Van Loan矩阵构造**
+    M = [ A,           G;
+          zeros(n, n), -A.' ];
     
+    % 矩阵指数
     EM = expm(M * T);
     
-    M12 = EM(1:n, n+1:end);
-    M22 = EM(n+1:end, n+1:end);
+    % **修正：正确的块选取**
+    Phi = EM(1:n, 1:n);              % 左上块：exp(A*T)
+    S   = EM(1:n, n+1:end);          % 右上块：积分项
     
-    Phi = M22';
-    Q = M22' * M12;
+    % **修正：正确的Q重构**
+    Q = Phi * S;
     
-    Q = (Q + Q') / 2;
+    % 确保对称性
+    Q = (Q + Q.') / 2;
     Q = Q + 1e-12 * eye(n);
 end
 
