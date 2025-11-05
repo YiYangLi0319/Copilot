@@ -1,0 +1,351 @@
+================================================================
+  机动感知跟踪网络 (Attention-Based Maneuver-Aware Tracking Network)
+  Implementation Summary
+================================================================
+
+Project: Copilot - Radar Target Tracking with Deep Learning
+Author: YiYangLi0319 with Copilot AI Assistant
+Date: 2025-11-05
+Version: 1.0.0
+
+================================================================
+  PROJECT OVERVIEW
+================================================================
+
+This project implements a complete deep learning framework for 
+maneuvering target tracking using attention mechanisms. It 
+integrates seamlessly with the existing radar_simulation_v3.m 
+dataset generator.
+
+Key Features:
+- LSTM/GRU-based temporal feature extraction
+- Self-attention for global temporal dependencies
+- Maneuver-aware attention for pattern recognition
+- Dual-branch output: state estimation + maneuver classification
+- Support for 2D/3D datasets
+- Multi-receiver fusion capability
+
+================================================================
+  FILE STRUCTURE
+================================================================
+
+tracking_network/
+├── Core Modules (5 files, ~3,200 lines)
+│   ├── data_loader_maneuver_tracking.m       (430 lines)
+│   ├── maneuver_aware_tracking_network.m     (480 lines)
+│   ├── attention_modules.m                   (560 lines)
+│   ├── train_maneuver_tracking.m             (545 lines)
+│   └── evaluate_tracking_network.m           (760 lines)
+│
+├── Utility Functions (3 files, ~1,250 lines)
+│   ├── utils/coordinate_conversion.m         (260 lines)
+│   ├── utils/metrics_computation.m           (440 lines)
+│   └── utils/visualization_tools.m           (565 lines)
+│
+├── Examples & Tests (4 files, ~900 lines)
+│   ├── example_complete_pipeline.m           (255 lines)
+│   ├── test_all_components.m                 (400 lines)
+│   ├── quick_start_guide.m                   (185 lines)
+│   └── tracking_network_main.m               (320 lines)
+│
+└── Documentation (1 file, ~335 lines)
+    └── README_tracking_network.md
+
+Total: 13 files, ~5,400 lines of code
+
+================================================================
+  IMPLEMENTATION DETAILS
+================================================================
+
+1. Data Loader (data_loader_maneuver_tracking.m)
+   - Loads scenarios from radar_simulation_v3.m dataset
+   - Sliding window sample construction
+   - Data normalization (minmax/zscore)
+   - Automatic dataset splitting
+   - Statistics computation
+
+2. Network Architecture (maneuver_aware_tracking_network.m)
+   - Input: [num_receivers × 3 × sequence_length]
+   - LSTM/GRU layers (configurable depth)
+   - Self-attention layer (multi-head)
+   - Maneuver-aware attention
+   - State estimation branch (9-dim output)
+   - Maneuver classification branch (4 classes)
+
+3. Attention Modules (attention_modules.m)
+   - Self-attention implementation
+   - Maneuver-aware attention
+   - Positional encoding
+   - Multi-head attention
+   - Attention analysis tools
+
+4. Training (train_maneuver_tracking.m)
+   - Combined loss: α*MSE + β*CrossEntropy
+   - Adam optimizer
+   - Learning rate scheduling
+   - Early stopping
+   - Checkpoint saving
+
+5. Evaluation (evaluate_tracking_network.m)
+   - State estimation metrics (RMSE, MAE)
+   - Classification metrics (accuracy, F1)
+   - Trajectory visualization
+   - Attention heatmaps
+   - Error distribution analysis
+
+6. Utilities
+   - Coordinate transformations
+   - Performance metrics
+   - Visualization tools
+
+================================================================
+  TESTING FRAMEWORK
+================================================================
+
+Test Suite (test_all_components.m):
+1. Coordinate conversion tools
+   - Spherical ↔ Cartesian conversion
+   - Bistatic measurement computation
+   - Angle normalization
+
+2. Performance metrics
+   - RMSE, MAE, R² calculation
+   - Classification metrics
+   - Confusion matrix
+
+3. Attention mechanisms
+   - Positional encoding
+   - Attention weight computation
+   - Causal masking
+
+4. Network architecture
+   - Network creation
+   - Parameter estimation
+
+5. Visualization tools
+   - 2D/3D trajectory plots
+   - Attention heatmaps
+   - Confusion matrices
+
+6. Data loader (requires dataset)
+   - Sample loading
+   - Data normalization
+   - Label validation
+
+================================================================
+  USAGE INSTRUCTIONS
+================================================================
+
+Quick Start:
+1. Generate dataset:
+   >> cd ..
+   >> radar_simulation_v3
+   
+2. Run quick start:
+   >> cd tracking_network
+   >> quick_start_guide
+
+3. Or use interactive menu:
+   >> tracking_network_main
+
+Complete Pipeline:
+1. Run tests:
+   >> test_all_components
+
+2. Train network:
+   >> example_complete_pipeline
+
+3. Evaluate model:
+   >> evaluate_tracking_network(model_file, dataset_path, config)
+
+================================================================
+  CONFIGURATION PARAMETERS
+================================================================
+
+Data Configuration:
+- sequence_length: 50 (input sequence length)
+- stride: 10 (sliding window step)
+- train_ratio: 0.7 (training set proportion)
+- normalize_method: 'minmax' or 'zscore'
+
+Network Configuration:
+- hidden_size: 128 (LSTM hidden units)
+- num_lstm_layers: 2 (LSTM depth)
+- num_attention_heads: 8 (attention heads)
+- dropout_rate: 0.2 (dropout probability)
+
+Training Configuration:
+- batch_size: 32
+- num_epochs: 100
+- learning_rate: 0.001
+- state_loss_weight: 1.0
+- maneuver_loss_weight: 0.5
+
+================================================================
+  PERFORMANCE METRICS
+================================================================
+
+State Estimation:
+- Position RMSE (meters)
+- Velocity RMSE (m/s)
+- Acceleration RMSE (m/s²)
+- Overall RMSE
+
+Maneuver Classification:
+- Accuracy (%)
+- Precision (per class)
+- Recall (per class)
+- F1 Score (per class)
+- Confusion matrix
+
+Additional Metrics:
+- ATE (Absolute Trajectory Error)
+- RTE (Relative Trajectory Error)
+- OSPA distance
+- Detection delay
+
+================================================================
+  VISUALIZATION OUTPUTS
+================================================================
+
+1. Training Progress:
+   - Loss curves (train/validation)
+   - Accuracy curves
+
+2. Trajectory Analysis:
+   - 2D/3D trajectory comparison
+   - Position/velocity/acceleration plots
+   - Error distributions
+
+3. Attention Analysis:
+   - Attention weight heatmaps
+   - Attention pattern analysis
+   - Temporal focus visualization
+
+4. Maneuver Detection:
+   - Detection timeline
+   - Confusion matrix
+   - Class distribution
+
+5. Error Analysis:
+   - Error histograms
+   - Box plots per dimension
+   - Statistical summaries
+
+================================================================
+  TECHNICAL SPECIFICATIONS
+================================================================
+
+Requirements:
+- MATLAB R2020a or later
+- Deep Learning Toolbox
+- Statistics and Machine Learning Toolbox
+- (Optional) Parallel Computing Toolbox for GPU
+
+Input Format:
+- Samples: [N × 3 × 3 × 50]
+  (N samples, 3 receivers, 3 features, 50 timesteps)
+- State labels: [N × 9]
+  (position + velocity + acceleration)
+- Maneuver labels: [N × 1]
+  (1=CV, 2=CA, 3=CT, 4=Singer)
+
+Output Format:
+- State prediction: [N × 9]
+- Maneuver prediction: [N × 1]
+- Attention weights: [N × seq_len × seq_len]
+
+================================================================
+  EXTENSIBILITY
+================================================================
+
+The framework is designed for easy extension:
+
+1. Custom Network Architectures:
+   - Modify maneuver_aware_tracking_network.m
+   - Add new attention mechanisms
+   - Change output branches
+
+2. Custom Loss Functions:
+   - Edit train_maneuver_tracking.m
+   - Implement new loss components
+   - Adjust loss weights
+
+3. Custom Metrics:
+   - Add to metrics_computation.m
+   - Implement domain-specific metrics
+
+4. Custom Visualizations:
+   - Add to visualization_tools.m
+   - Create new plot types
+
+5. Data Augmentation:
+   - Modify data_loader_maneuver_tracking.m
+   - Add augmentation strategies
+
+================================================================
+  KNOWN LIMITATIONS
+================================================================
+
+1. MATLAB Version:
+   - Some features require R2020a+
+   - LayerGraph functionality may be limited
+
+2. Training:
+   - Custom training loop is simplified
+   - Full backpropagation requires manual implementation
+   - GPU support depends on available toolboxes
+
+3. Dataset:
+   - Requires pre-generated radar datasets
+   - Fixed data format from radar_simulation_v3.m
+
+4. Scalability:
+   - Large networks may require significant memory
+   - Batch size limited by available RAM
+
+================================================================
+  FUTURE ENHANCEMENTS
+================================================================
+
+Potential improvements:
+- Transformer-based architecture
+- Online learning capability
+- Real-time inference optimization
+- Additional maneuver models
+- Ensemble methods
+- Transfer learning utilities
+- Distributed training support
+
+================================================================
+  REFERENCES
+================================================================
+
+Related Papers:
+- Attention-Based Maneuver-Aware Tracking Network for 
+  Maneuvering Target Tracking (2024)
+
+Dataset Generator:
+- radar_simulation_v3.m (YiYangLi0319/Copilot)
+
+================================================================
+  LICENSE & CONTACT
+================================================================
+
+License: MIT
+
+Author: YiYangLi0319
+GitHub: https://github.com/YiYangLi0319/Copilot
+
+================================================================
+  VERSION HISTORY
+================================================================
+
+v1.0.0 (2025-11-05) - Initial Release
+- Complete framework implementation
+- 13 MATLAB files
+- 6 test suites
+- Comprehensive documentation
+- Example scripts
+
+================================================================
